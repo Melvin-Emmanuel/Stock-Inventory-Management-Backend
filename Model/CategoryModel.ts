@@ -15,10 +15,10 @@ const CategorySchema = new mongoose.Schema({
     Slug:{
         type:String
     },
-    Products: {
+    Products: [{
         type: mongoose.Schema.Types.ObjectId,
         ref:"products"
-    },
+    }],
     User: {
         type: mongoose.Schema.Types.ObjectId,
         ref:"users"

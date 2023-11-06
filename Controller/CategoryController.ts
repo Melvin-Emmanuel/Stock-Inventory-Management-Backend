@@ -34,8 +34,10 @@ export const CreateCategory = async (req: Request, res: Response):Promise<Respon
          Name,
          Slug: `${slugify(Name)}-${generateCategoryId()}`,
        });
+    
+    //    CatData.Products=[]
        CatData.User = checkUser
-     await CatData.save();
+      CatData.save();
      
     
      return res.status(201).json({

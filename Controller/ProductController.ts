@@ -4,9 +4,9 @@ import UserModel from "../Model/UserModel"
 import ProductModel from "../Model/ProductModel"
 import cloudinary from "../utils/cloudinary"
 import mongoose from "mongoose"
-import path from "path"
+// import path from "path"
 
-export const CreateProduct = async (req: Request, res: Response): Promise<Response> => {
+export const CreateProduct = async(req:any, res: Response): Promise<Response> => {
     try {
         const { catID } = req.params
         const { Name, Image, Desc, Quantity, Price, Category } = req.body
@@ -15,26 +15,28 @@ export const CreateProduct = async (req: Request, res: Response): Promise<Respon
         //         message:"fields cannot be empty"
         //     })
         // }
-        const getCat: any = await CategoryModel.findById(catID)
-        // console.log(getCat)
+        const getCat: any = await CategoryModel.findOne({_id:catID})
+        console.log(getCat)
         if (!getCat) {
             return res.status(404).json({
                 message:"This Category does not exist. you must crate category first"
             })
         }
-        const userId = await  getCat?.User
+        const userId = await  getCat?.User._id
         console.log(userId)
         const checkUser=await UserModel.findOne({_id:userId})
         if (!checkUser) {
             return res.status(404).json({
-                message:"user does not exist to create category. signup to create"
+                message:"user does not exist to create Product. signup to create"
             })
         }
+     
+        console.log("hvjhvjh",req.file.path);
         const ImageURl = await cloudinary.uploader.upload(req.file.path)
-        console.log(ImageURl)
+       
         const createProduct = await ProductModel.create({
           Name,
-          Image:ImageURl.secure_url,
+        //   Image:ImageURl.secure_url,
           Desc,
           Quantity,
           Price,
@@ -42,6 +44,7 @@ export const CreateProduct = async (req: Request, res: Response): Promise<Respon
         });
         getCat.Products.push(new mongoose.Types.ObjectId(createProduct._id))
         await createProduct.save()
+        await getCat.save()
         return res.status(201).json({
             message: "Product created successfully",
             result:CreateProduct

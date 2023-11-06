@@ -3,6 +3,7 @@ import ProfileModel from "../Model/ProfileModel";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import Jwt from "jsonwebtoken"
+import ProductModel from "../Model/ProductModel";
 
 
 export const createUser = async (req: Request, res: Response) => {
@@ -16,7 +17,7 @@ export const createUser = async (req: Request, res: Response) => {
 
     const checkemail = await userModel.findOne({ Email: Email });
 
-    if (checkemail) {
+    if (!checkemail) {
       return res.status(401).json({
         message: "email already in use",
       });
@@ -42,7 +43,7 @@ export const createUser = async (req: Request, res: Response) => {
     UserData.Profile = createProfile._id;
     await UserData.save();
     return res.status(201).json({
-      message: "registaration successful",
+      message: "registration successful",
       success: 1,
       result: UserData,
     });
@@ -60,7 +61,7 @@ export const UserLogin = async (req: Request, res: Response): Promise<Response>=
   try {
     const { Email, Password } = req.body;
     if (!Email || !Password) {
-      return res.status(500).json({ message: "please fill all fields" });
+      return res.status(401).json({ message: "please fill all fields" });
     }
     const checkEmail: any = await userModel.findOne({ Email: Email });
     console.log(checkEmail);
@@ -74,7 +75,7 @@ export const UserLogin = async (req: Request, res: Response): Promise<Response>=
             Role: checkEmail.Role,
           },
           "melvinmelasiemmanuelUserVerification",
-          { expiresIn: "4m" }
+          { expiresIn: "4d" }
         );
         console.log(token);
         res.cookie("sessionId", token);
@@ -84,13 +85,13 @@ export const UserLogin = async (req: Request, res: Response): Promise<Response>=
           message: "login successful",
         });
       } else {
-        return res.status(500).json({ message: "incorrect password" });
+        return res.status(404).json({ message: "incorrect password" });
       }
     } else {
-      return res.status(500).json({ message: "user not found" });
+      return res.status(404).json({ message: "user not found" });
     }
   } catch (error: any) {
-    return res.status(404).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 }
 // export const getSingleUser = async (
@@ -121,3 +122,27 @@ export const UserLogin = async (req: Request, res: Response): Promise<Response>=
 //     });
 //   }
 // };
+
+
+export const checkOutProduct = async (req: Request, res: Response): Promise<Response> => {
+
+  try {
+    
+    const { ProductID } = req.params
+    const getProducct = await ProductModel.findById(ProductID)
+    if (!getProducct) {
+      return res.status(404).json({
+        message:"product does not exist"
+      })
+    }
+
+
+  } catch (error:any) {
+    return res.status(401).json({
+      message:error.Message
+    })
+    
+  }
+  
+}
+

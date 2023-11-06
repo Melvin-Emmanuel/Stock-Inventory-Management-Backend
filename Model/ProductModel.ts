@@ -5,7 +5,7 @@ interface Products {
   Image: string;
   Desc: string;
   Quantity: string;
-  Price: string;
+  Price: number;
   Category: string;
 
 }
