@@ -3,9 +3,10 @@ import CategoryModel from "../Model/CategoryModel"
 import UserModel from "../Model/UserModel"
 import slugify from "slugify"
 
-export const CreateCategory = async (req: Request, res: Response):Promise<Response> => {
+export const CreateCategory = async (req:any, res: Response):Promise<Response> => {
  try {
-       const { Name, Slug } = req.body;
+     const { Name, Slug } = req.body;
+     const userID = req.user;
        function generateCategoryId() {
          const characters = "ABCDEFGHIJKLMNOPRSTUabcdefghijklmnop";
          const length = 6;
@@ -16,13 +17,24 @@ export const CreateCategory = async (req: Request, res: Response):Promise<Respon
            );
          }
          return randomId;
+     }
+       const checkCategory = await CategoryModel.findOne({ Name: Name });
+       if (checkCategory) {
+         return res.status(401).json({
+           message: "this category already exists",
+         });
        }
        if (!Name) {
          return res.status(401).json({
            message: "name cannot be empty",
          });
-       }
-       const { userID } = req.params;
+     }
+     let x:number=4
+   
+     //   const { userID } = req.params;
+     
+     
+     
        const checkUser = await  UserModel.findOne({ _id: userID });
        console.log(checkUser)
        if (!checkUser) {
@@ -34,9 +46,10 @@ export const CreateCategory = async (req: Request, res: Response):Promise<Respon
          Name,
          Slug: `${slugify(Name)}-${generateCategoryId()}`,
        });
+   
     
     //    CatData.Products=[]
-       CatData.User = checkUser
+       CatData.User = userID
       CatData.save();
      
     

@@ -17,7 +17,7 @@ export const createUser = async (req: Request, res: Response) => {
 
     const checkemail = await userModel.findOne({ Email: Email });
 
-    if (!checkemail) {
+    if (checkemail) {
       return res.status(401).json({
         message: "email already in use",
       });

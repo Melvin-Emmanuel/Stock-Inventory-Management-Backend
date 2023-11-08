@@ -5,7 +5,7 @@ import { upload } from "../utils/Multer"
 const router = express.Router()
 
 
-router.route("/Create-Product/:catID").post(verifyUser,upload, CreateProduct
+router.route("/Create-Product").post(verifyUser,upload, CreateProduct
 )
 
 export default router
